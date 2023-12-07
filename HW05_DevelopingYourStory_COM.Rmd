@@ -1,0 +1,219 @@
+---
+title: "HW05 - Developing A Story"
+output:
+  html_document:
+    keep_md: yes
+    toc: yes
+    theme: flatly
+    toc_float: yes
+    code_folding: hide
+    number_sections: no
+    css: style.css
+---
+
+<br>
+
+**Author: Alec Jacobs**
+
+Course: Communication In Urban Spatial Analytics
+
+```{r clear_environment, include = FALSE}
+
+# Clears Working Environment Including "Removing" Any User-Defined Objects
+
+rm(list=ls())
+
+```
+
+```{r import_libraries, include = FALSE}
+
+# Loading In Project Specific Library Packages
+
+library(tidyverse) # Data Science Workflow & Representation
+library(tidycensus) # Load United States Census Boundary & Attribute Data
+library(dplyr) # A Grammar of Data Frame Manipulation, In & Out Of Memory
+library(ggplot2) # System For 'Declaratively' Creating Elegant Visualizations
+library(knitr) # General-Purpose Package for Dynamic Report Generation
+library(kableExtra) # Construct Complex Table with 'Kable' and Pipe Syntax
+
+```
+
+<br>
+
+**OP-ED: Park City's Paradox - A Bustling Resort Town Facing A Housing Crisis For Its Essential Workers**
+
+<br>
+
+Hidden beneath the glamour of Park City, a latent crisis unfolds each winter casting a shadow over the town's reputation as a beacon of seasonal work opportunity. While tourists flock to the ski slopes, thousands of seasonal workers - the core behind the operations - grapple with a significant challenge: the desperate lack of affordable workforce housing. This stark reality casts a shadow over Park City, masked by overall wealth. Often, resort towns struggle with affordable workforce housing. Yet, few communities experience the pressure as acutely as Park City, a former mining town rebirthed as a global winter attraction welcoming millions of visitors annually.
+
+The money added to Utah's economy by visitors to Summit County alone exceeds $1 billion each year. With growth accelerating in the last few decades, Park City is now one of the most affluent and bustling resort towns in the United States. The tourist industry contributes to over one-third of the total economic value to the state of Utah with Park City drawing on average 4,006,071 annual visitors - 2,603,775 in the winter and the rest in the summer months. Unfortunately, tourism has only exacerbated the local affordable housing crisis, displayed clearly by a median sales price for a single-family home hovering around $3.2 million and high rents to match.
+
+Adding to the situation's severity, Utah's current housing markets are the least affordable in state's history and Park City is no exception. Further, according to the "Housing Needs Assessment" released by the municipality in 2021, Park City stands as the only city in Utah where the number of jobs (11,000) outnumbers the population (8,500). This results in an extraordinary level of commuting by relatively lower-wage employees with additional, seasonal labor filling the gap. In turn, contributing to a scarcity of affordable housing and a local labor shortage which perpetuates a problematic feedback loop.
+
+While Park City boasts the most aggressive local inclusionary affordable housing obligation (20%) requirement in Utah, affordable housing shortages remain - evident from the high (99%) occupancy rate reflecting demand. Outlined in the "Housing Needs Assessment," it is projected that the city will need an additional 800-1,000 units of workforce housing over the next five years. The elevated costs of land and construction coupled with the desirability to live in Park City continues to naturally drive up housing prices. Consequently, the city laid out plans to develop 600 affordable housing units by 2026, aligned with an initiative adopted to build 800 affordable housing units by the same year. Further, the Park City Council - recognizing affordable housing as a critical community priority - plans to allocate approximately $40 million to achieve their goal. The general plan also underscores the significance of expanding a diversity of housing to meet the needs of all residents, aiming for 15% coverage of the need for workforce housing.
+
+<br>
+
+![](OCCUPANCY RATE.jpg)
+
+```{r occupancy_rate, warning=FALSE, fig.align='center', include = TRUE, fig.keep = "none"}
+
+library(ggplot2)
+
+# Occupancy Rate for Apartments in the Park City Area
+
+# Source: Mountainlands Community Housing Trust
+
+# Creating a Dataframe With the Provided Data
+occupancy_data <- data.frame(
+  Year = c(2017, 2018, 2019, 2020, 2021),
+  Units_Surveyed = c(689, 689, 689, 689, 697),
+  Occupied = c(675, 682, 683, 680, 685),
+  Vacant = c(14, 7, 6, 9, 12),
+  Occupancy_Rate = c(98.0, 99.0, 99.1, 98.7, 98.3))
+
+# Plotting the Data Using GGplot
+ggplot(occupancy_data, aes(x = Year, y = Occupancy_Rate, group = 1)) +
+  geom_line(color = "#FF5800", size = 1) + 
+  geom_point(color = "#FF5800", size = 3) +  
+  labs(title = "Occupancy Rate for Apartments in the Park City Area",
+       x = "Year",
+       y = "Occupancy Rate (%)") +
+  theme_minimal() +
+  annotate("text", x = Inf, y = -Inf, hjust = 1.05, vjust = -1.25,
+           label = "Source: Mountainlands Community Housing Trust",
+           color = "gray", size = 3)
+
+```
+
+<br>
+
+Currently, the affordable housing inventory caters to only 6% of the workforce and the planned 600 units would only raise this to 11%, still 400 units short of the city's goal. The affordable housing need is marked by the housing cost burdens of residents, affecting 40% of renters and 22% of homeowners. Population projections indicate a growing demand for affordable housing, as Park City's workforce exceeds its population. Over 8,000 workers commute daily due to a lack of affordable housing. There continues to be a gap in demand for 330 renters with housing cost burdens; 100 units for demographic growth; and additional units for commuting workers. While the proposed 600 units are a commendable step, the supply falls short of meeting the demand for affordable housing in Park City.
+
+<br>
+
+```{r housing_inventory, fig.align='center', include = TRUE, fig.keep = "none"}
+
+#Inventory of Park City’s Affordable Housing,  Placed in Service 2016 to 2021 
+
+#Source: Park City Department of Community Development
+
+library(kableExtra)
+
+# Create a data frame with the provided data
+data <- data.frame(
+  Project_Name = c("The Retreat at the Park (1, 2 & 3 BR Detached Homes)", 
+                   "Central Park City Condominiums (Studio and 2 BR Condos)", 
+                   "Woodside Park, Phase One", 
+                   "Park City Heights (2 & 3 BR Townhomes and 3 & 4 BR Detached Units)", 
+                   "Kings Crown", 
+                   "Rail Central (SRO Units)", 
+                   "1440 Empire Avenue (2 BR APTS)", 
+                   "ClaimJumper 3 BR Condo", 
+                   "Empire Pass/Deer Crest/Flagstaff Units – ONMTN Development"),
+  
+  Funding = c("RDA", "RDA", "RDA", "IZ", "IZ", "IZ", "IZ", "IZ", "IZ"),
+  
+  Year_Built = c(2018, 2018, 2019, "2016 to 2021", 2020, 2020, 2020, 2020, 2021),
+  
+  Owned_Rental = c("Owned", "Owned", "Owned", "Rental", "Rental", "Rental", "Rental", "Rental", "Rental"),
+  
+  AMI = c("80%", "80-120%", "60-120%", "80-120%", "80-120%", "35-80%", "35-80%", "35-80%", "60-80%"))
+
+# Create a Kable Table With Styling
+
+kable(data, "html") %>%
+  kable_styling(bootstrap_options = "striped", full_width = FALSE) %>%
+  scroll_box(width = "100%", height = "500px")
+
+```
+
+<br>
+
+![](COST BURDEN.jpg)
+
+```{r cost_burden, fig.align='center', include = TRUE, fig.keep = "none"}
+
+library(ggplot2)
+library(tidyr)
+
+# Housing Cost Burdens for Renters and Need for Affordable Units in Park City, 2021
+
+# Creating a Data Frame With Sourced Data From: U.S. Census Bureau, and HUD CHAS.
+
+housing_data <- data.frame(
+  AMI_Levels = c("≤30%", "30% to 50%", "50% to 80%", "80% to 100%", "100% to 120%", "Total"),
+  Renters = c(295, 175, 380, 200, 41, 1091),
+  Cost_Burden_30 = c(260, 151, 137, 36, 6, 590),
+  Cost_Burden_50 = c(192, 75, 65, 0, 0, 332))
+
+# Reshaping The Data For GGPlot
+housing_data_long <- gather(housing_data, key = "Cost_Burden_Type", value = "Count", -AMI_Levels, -Renters)
+
+# Creating A Line Graph Using GGPlot
+
+ggplot(housing_data_long, aes(x = AMI_Levels, y = Count, group = Cost_Burden_Type, color = Cost_Burden_Type)) +
+  geom_line(linetype = "solid", size = 1) +  # Change line type and width
+  geom_point(size = 3) +                          # Customize point size
+  labs(title = "Housing Cost Burdens for Renters in Park City, 2021",
+       x = "AMI Levels",
+       y = "Count") +
+  theme_minimal() +
+  scale_color_manual(values = c("Cost_Burden_30" = "#FF5500", "Cost_Burden_50" = "#AfAf64")) + 
+  annotate("text", x = Inf, y = -Inf, hjust = 1, vjust = -1,
+           label = "Source: U.S. Census Bureau, and HUD CHAS",
+           color = "gray", size = 3)
+
+```
+
+<br>
+
+Last winter, the lack of affordable workforce housing was highlighted when twelve foreign students from Argentina arrived in Park City to work on J-1 visas. Due to the housing shortage, these students ultimately wound up crammed into a one bedroom apartment bearing the burden of a staggering $12,000 monthly rent. The pressing combination of high demand for seasonal workers and the local housing crisis mixed with laissez-faire visa sponsors and predatory landlords has resulted in inadequate living conditions. This unfortunate reality is not only unique to these twelve J-1's; it resonates with the broader experience the thousands of J-1 workers who form an essential cog in Park City’s economy each winter. The housing need challenges faced by J-1's underscore not only the general need for comprehensive solutions surrounding affordable housing but expanded housing support and protections for the indispensable seasonal workforce.
+
+<br>
+
+![](HOUSING TYPES.jpg)
+
+```{r housing_types, fig.align='center', include = TRUE, fig.keep = "none"}
+
+library(tidyverse)
+
+paletteV4 <- c("#FF5500", "#AfAf64", "#7097A8")
+
+# Creating A Dataframe With The Provided Data
+
+housing_inventory <- data.frame(
+  Category = c("Total Housing Units", "Occupied", "Vacant", "Owner Occupied", "Renter Occupied Units", "Vacant Seasonal"),
+  
+  `2000` = c(6661, 2705, 3956, 1660, 1045, 3383),
+  `2010` = c(9471, 2885, 6586, 1775, 1110, 5609),
+  `2021` = c(10440, 3399, 7041, 2230, 1169, 6750))
+
+# Melt The Dataframe For A Better Visualization
+
+melted_data <- gather(housing_inventory, Year, Value, -Category)
+
+# Creating A Bar Plot Using GGPlot
+
+ggplot(melted_data, aes(x = Category, y = Value, fill = Year)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Changes in the Park City Housing Inventory by Type of Use",
+       x = "Category", y = "Count") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_fill_manual(values = paletteV4) +  # Customize fill colors
+  annotate("text", x = Inf, y = -Inf, hjust = 1, vjust = -1,
+           label = "Source: U.S. Census Bureau and Gardner Policy Institute, University of Utah",
+           color = "gray", size = 3)
+
+```
+
+<br>
+
+Ultimately, the plight of seasonal workers is aggravated by predatory practices of visa sponsors - the exploitative intermediary agencies charging excessive fees for arrangements that routinely fail the best interests of J-1 worker's regarding housing. Unfortunately, false promises are common with sponsors misleading workers by guaranteeing housing that frequently prove to be unreliable, or exorbitant in cost. Adding to the challenge is a lack of oversight of visa sponsors, allowing them to engage in these predatory practices with impunity. This lack of accountability contributes significantly to the hardships faced by seasonal workers, as they navigate a system that often prioritizes profit over the well-being and fair treatment of those essential to the success of Park City's seasonal economy.
+
+The responsibility for this situation cannot be solely attributed to deceitful visa sponsors; employers who rely on seasonal workers must also be held accountable. Notably, Park City Mountain Resort owner Vail Resorts and Deer Valley owner Alterra Mountain Resorts, the giants of Park City's tourism industry, have turned a blind eye to the housing situations of their transient workforce. These employers have failed to provide adequate housing for their seasonal workers, forcing them to navigate the overcrowded and inaccessible rental market. The lack of employer-provided housing not only places a substantial burden on the seasonal workforce but also leaves them vulnerable to exploitation by visa sponsors and landlords. The need for a collective commitment by PCMR and Deer Valley to house their workers is paramount in addressing the root causes of the housing crisis in Park City.
+
+Mayor, we call upon you to act in support of the workers essential to the success of Park City's seasonal economy. First, we implore you to compel PCMR (owner Vail Resorts) and Deer Valley (owner Alterra Mountain Resorts) to shoulder the responsibility of locating and providing housing for their seasonal workforce. It it critical to insist on the duty of the ski areas to actively contribute to resolving the housing crisis, especially since they enable the housing crisis. Secondly, we advocate for the election of a dedicated liaison to champion the rights and well-being of seasonal workers protecting them from the exploitative practices of visa sponsors and unresponsive employers. The liaison would serve as a vital intermediary, fostering the communication between the seasonal workers and their employers or sponsors. This advocate would play a pivotal role in ensuring that the rights of these vulnerable workers are upheld and their search for adequate, affordable housing is successful.
+
+While the affordable housing crisis in Park City is complex and multifaceted, targeted steps geared towards specific segments of the community can significantly lead to a wide ranging effect. Therefore, as a concerned resident writing on behalf of fellow neighbors in Park City, I call upon elected leadership to enact a two-pronged solution: (1) demand accountability of PCMR and Deer Valley to provide workforce housing, and (2) elect a housing liaison protecting seasonal labor in the search for housing. These two demands are essential to foster a more equitable and affordable housing landscape in Park City, emphasizing tactical measures over sweeping visions to effectively address the affordability housing crisis.
